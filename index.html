@@ -1,0 +1,2119 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PE E-Learning: สื่อการสอนวิชาพละศึกษา (Updated)</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Sarabun:wght@300;400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <!-- EmailJS for sending certificates -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+    <style>
+        /* =========================================
+           1. VARIABLES & RESET
+           ========================================= */
+        :root {
+            --primary: #5677fc;
+            --primary-dark: #2a36b1;
+            --primary-light: #91a7ff;
+            --accent: #00e5ff;
+            --bg-deep: #050714;
+            --text-main: #ffffff;
+            --text-muted: #b0b3c5;
+            --glass: rgba(16, 20, 45, 0.7);
+            --glass-border: 1px solid rgba(86, 119, 252, 0.2);
+            --shadow-neon: 0 0 15px rgba(86, 119, 252, 0.4);
+            --card-radius: 20px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            overflow-x: hidden;
+            min-height: 100vh;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0e29;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
+            border-radius: 4px;
+        }
+
+        /* =========================================
+           2. BACKGROUND ANIMATION (CANVAS)
+           ========================================= */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 50% 50%, #1a1f45 0%, #000000 100%);
+        }
+
+        /* =========================================
+           3. PRELOADER
+           ========================================= */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader-ring {
+            width: 80px;
+            height: 80px;
+            border: 5px solid transparent;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        .loader-ring:before {
+            content: "";
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border: 5px solid transparent;
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 2s linear infinite;
+        }
+
+        .loader-text {
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            background: linear-gradient(to right, #fff, var(--primary));
+            -webkit-background-clip: text;
+            color: transparent;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.6;
+            }
+        }
+
+        /* =========================================
+           4. GRADIENT BUTTON
+           ========================================= */
+        .gradient-button {
+            position: relative;
+            padding: 14px 35px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: white;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            border-radius: 50px;
+            overflow: hidden;
+            transition: transform 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .gradient-button:hover {
+            transform: translateY(-3px) scale(1.02);
+        }
+
+        .gradient-button:active {
+            transform: scale(0.98);
+        }
+
+        .gradient-button::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3, #ff6b6b);
+            z-index: -2;
+            filter: blur(10px);
+            animation: rotate-bg 4s linear infinite;
+        }
+
+        .gradient-button::after {
+            content: "";
+            position: absolute;
+            inset: 2px;
+            background: #000;
+            border-radius: 48px;
+            z-index: -1;
+        }
+
+        .gradient-text {
+            background: conic-gradient(from 0deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3, #ff6b6b);
+            -webkit-background-clip: text;
+            color: transparent;
+            font-weight: 700;
+        }
+
+        @keyframes rotate-bg {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* =========================================
+           5. LAYOUT COMPONENTS
+           ========================================= */
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: none;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: var(--glass-border);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+            color: var(--primary);
+        }
+
+        .logo-text h1 {
+            font-size: 1.5rem;
+            line-height: 1;
+            margin-bottom: 5px;
+        }
+
+        .logo-text p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: 2px solid #fff;
+        }
+
+        /* Navigation Grid */
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+
+        .nav-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 20px 10px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-item i {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            transition: var(--transition);
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background: rgba(86, 119, 252, 0.15);
+            border-color: var(--primary);
+            color: #fff;
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-neon);
+        }
+
+        .nav-item.active i {
+            color: var(--accent);
+        }
+
+        /* Pages */
+        .page-section {
+            display: none;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        /* Login Screen */
+        #login-screen {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .login-card {
+            background: rgba(13, 17, 39, 0.85);
+            backdrop-filter: blur(20px);
+            padding: 60px 40px;
+            border-radius: 30px;
+            border: 2px solid rgba(86, 119, 252, 0.3);
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 0 60px rgba(42, 54, 177, 0.2);
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 18px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid var(--primary-light);
+            border-radius: 50px;
+            color: #fff;
+            font-size: 1.1rem;
+            text-align: center;
+            margin: 30px 0;
+            transition: 0.3s;
+        }
+
+        .login-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px var(--primary);
+        }
+
+        /* =========================================
+           6. CONTENT STYLES
+           ========================================= */
+
+        /* Lesson Cards */
+        .lessons-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .lesson-card {
+            background: var(--glass);
+            border: var(--glass-border);
+            border-radius: var(--card-radius);
+            overflow: hidden;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .lesson-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .lesson-thumb {
+            height: 180px;
+            width: 100%;
+            object-fit: cover;
+        }
+
+        .lesson-info {
+            padding: 20px;
+        }
+
+        .lesson-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--primary-light);
+        }
+
+        /* Reader */
+        .reader-box {
+            background: rgba(10, 14, 30, 0.95);
+            border-radius: 25px;
+            padding: 40px;
+            border: 1px solid var(--primary);
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+            max-width: 900px;
+            margin: 0 auto;
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+
+        .reader-box h1 {
+            color: var(--accent);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 15px;
+        }
+
+        .reader-box h3 {
+            color: var(--primary-light);
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .reader-box ul,
+        .reader-box ol {
+            padding-left: 25px;
+            margin-bottom: 20px;
+            color: #d1d5db;
+        }
+
+        .reader-box li {
+            margin-bottom: 10px;
+        }
+
+        /* 3D Carousel */
+        .carousel-stage {
+            perspective: 1200px;
+            height: 450px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .carousel-spinner {
+            width: 260px;
+            height: 360px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .vid-card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, rgba(42, 54, 177, 0.9), rgba(10, 14, 41, 0.95));
+            border: 2px solid var(--primary);
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(86, 119, 252, 0.3);
+            transition: 0.3s;
+        }
+
+        .vid-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 40px var(--accent);
+        }
+
+        .vid-card i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: var(--primary-light);
+        }
+
+        .controls {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: 0.3s;
+        }
+
+        .control-btn:hover {
+            background: var(--primary);
+        }
+
+        /* Quiz System */
+        .quiz-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--glass);
+            padding: 40px;
+            border-radius: 25px;
+            position: relative;
+        }
+
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+        .question-text {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .option-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 18px;
+            border-radius: 15px;
+            text-align: left;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #ddd;
+            font-size: 1.1rem;
+        }
+
+        .option-btn:hover {
+            background: rgba(86, 119, 252, 0.2);
+            border-color: var(--primary);
+        }
+
+        .option-btn.selected {
+            background: var(--primary);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        /* BMI Calculator */
+        .bmi-card {
+            background: radial-gradient(circle at center, #1a237e 0%, #000 100%);
+            border: 2px solid var(--primary);
+            border-radius: 30px;
+            padding: 50px;
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
+            box-shadow: 0 0 50px rgba(42, 54, 177, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bmi-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(var(--primary) 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        .gauge-box {
+            position: relative;
+            width: 300px;
+            height: 150px;
+            margin: 30px auto;
+        }
+
+        .gauge-arc {
+            width: 100%;
+            height: 100%;
+            background: #222;
+            border-radius: 150px 150px 0 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gauge-color {
+            width: 100%;
+            height: 100%;
+            background: conic-gradient(from 180deg, #00e5ff 0deg 36deg, #00e676 36deg 72deg, #ffea00 72deg 108deg, #ff9100 108deg 144deg, #ff1744 144deg 180deg);
+        }
+
+        .gauge-center {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 240px;
+            height: 120px;
+            background: #0a0e29;
+            border-radius: 150px 150px 0 0;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 10px;
+        }
+
+        .needle {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 4px;
+            height: 140px;
+            background: #fff;
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(-90deg);
+            transition: transform 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
+            box-shadow: 0 0 10px white;
+        }
+
+        /* Neon Contact */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            padding: 20px;
+        }
+
+        .neon-card-link {
+            text-decoration: none;
+            display: block;
+        }
+
+        .neon-contact {
+            position: relative;
+            padding: 3px;
+            border-radius: 20px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+
+        .neon-contact:hover {
+            transform: translateY(-10px) scale(1.02);
+            z-index: 5;
+        }
+
+        .neon-contact::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(transparent, transparent, transparent, var(--primary));
+            animation: spin-border 4s linear infinite;
+        }
+
+        .neon-contact::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(transparent, transparent, transparent, var(--accent));
+            animation: spin-border 4s linear infinite;
+            animation-delay: -2s;
+        }
+
+        .neon-inner {
+            position: relative;
+            background: #0d1126;
+            border-radius: 18px;
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            z-index: 1;
+        }
+
+        .neon-contact:hover .neon-inner {
+            background: #151b3b;
+        }
+
+        @keyframes spin-border {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Utils */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-20 {
+            margin-top: 20px;
+        }
+
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+
+        #certCanvas {
+            display: none;
+        }
+
+        #certImage {
+            max-width: 100%;
+            border: 5px solid gold;
+            box-shadow: 0 0 30px gold;
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+
+        /* =========================================
+           7. MOBILE RESPONSIVE
+           ========================================= */
+        @media (max-width: 768px) {
+
+            /* Container */
+            .app-container {
+                padding: 10px;
+                width: 100%;
+            }
+
+            /* Header */
+            header {
+                flex-direction: column;
+                padding: 20px;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .logo-area {
+                justify-content: center;
+                flex-direction: column;
+            }
+
+            .user-profile {
+                justify-content: center;
+                width: 100%;
+                margin-top: 10px;
+                padding-top: 15px;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            /* Navigation */
+            .nav-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+
+            .nav-item {
+                padding: 15px 5px;
+                font-size: 0.8rem;
+            }
+
+            .nav-item i {
+                font-size: 1.5rem;
+            }
+
+            /* Homepage */
+            #home h1 {
+                font-size: 2.2rem !important;
+            }
+
+            #home p {
+                font-size: 1rem !important;
+                padding: 0 10px;
+            }
+
+            /* Lesson Grid */
+            .lessons-container {
+                grid-template-columns: 1fr;
+            }
+
+            /* 3D Carousel (Mobile Adjustment) */
+            .carousel-stage {
+                height: 350px;
+                perspective: 800px;
+            }
+
+            .carousel-spinner {
+                width: 200px;
+                height: 280px;
+            }
+
+            .vid-card i {
+                font-size: 3rem;
+            }
+
+            /* Quiz */
+            .quiz-wrapper {
+                padding: 25px 15px;
+            }
+
+            .quiz-header {
+                font-size: 1rem;
+            }
+
+            .question-text {
+                font-size: 1.2rem;
+            }
+
+            /* BMI Calculator */
+            .bmi-card {
+                padding: 30px 15px;
+            }
+
+            .bmi-card h2 {
+                font-size: 1.8rem !important;
+            }
+
+            .gauge-box {
+                width: 100%;
+                max-width: 280px;
+                height: 140px;
+            }
+
+            .gauge-center {
+                width: 200px;
+                height: 100px;
+            }
+
+            .needle {
+                height: 120px;
+            }
+
+            #bmi-val {
+                font-size: 2rem !important;
+            }
+
+            /* Login Screen */
+            .login-card {
+                padding: 40px 20px;
+                width: 90%;
+            }
+
+            .login-card h1 {
+                font-size: 2rem !important;
+            }
+
+            /* Reader */
+            .reader-box {
+                padding: 20px;
+            }
+
+            .reader-box h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="preloader">
+        <div class="loader-ring"></div>
+        <div class="loader-text">LOADING...</div>
+    </div>
+
+    <canvas id="particle-canvas"></canvas>
+
+    <div id="login-screen">
+        <div class="login-card animate__animated animate__zoomIn">
+            <div style="font-size: 3rem; color: var(--primary); margin-bottom: 10px;">
+                <i class="fas fa-dumbbell"></i>
+            </div>
+            <h1 style="font-size: 2.5rem; text-shadow: 0 0 20px var(--primary); margin-bottom: 5px;">สื่อการสอน</h1>
+            <h2 style="font-size: 2rem; color: var(--primary-light); margin-bottom: 30px;">วิชาพละศึกษา</h2>
+            <p style="color: var(--text-muted); margin-bottom: 30px;">ระบบ E-Learning เพื่อสุขภาพและการกีฬา</p>
+
+            <input type="text" id="username-input" class="login-input" placeholder="กรอกชื่อ - นามสกุล ของคุณ">
+
+            <button class="gradient-button" onclick="app.login()">
+                <span class="gradient-text">เข้าสู่บทเรียน <i class="fas fa-arrow-right"></i></span>
+            </button>
+        </div>
+    </div>
+
+    <div id="app" class="app-container">
+
+        <header>
+            <div class="logo-area">
+                <i class="fas fa-running logo-icon"></i>
+                <div class="logo-text">
+                    <h1>PE Class</h1>
+                    <p>Online Learning Platform</p>
+                </div>
+            </div>
+            <div class="user-profile">
+                <div style="text-align: right;">
+                    <div id="display-name" style="font-weight: bold; color: var(--primary-light);">Guest</div>
+                    <div style="font-size: 0.8rem; color: #888;">นักเรียน</div>
+                </div>
+                <div class="user-avatar"><i class="fas fa-user"></i></div>
+                <button class="gradient-button" style="padding: 8px 20px; font-size: 0.9rem;" onclick="app.logout()">
+                    <span class="gradient-text">ออก</span>
+                </button>
+            </div>
+        </header>
+
+        <nav class="nav-grid">
+            <div class="nav-item active" onclick="app.nav('home')">
+                <i class="fas fa-home"></i> <span>หน้าหลัก</span>
+            </div>
+            <div class="nav-item" onclick="app.nav('lessons')">
+                <i class="fas fa-book-open"></i> <span>บทเรียน</span>
+            </div>
+            <div class="nav-item" onclick="app.nav('videos')">
+                <i class="fas fa-video"></i> <span>วิดีโอ 3D</span>
+            </div>
+            <div class="nav-item" onclick="app.nav('quiz')">
+                <i class="fas fa-clipboard-list"></i> <span>แบบทดสอบ</span>
+            </div>
+            <div class="nav-item" onclick="app.nav('bmi')">
+                <i class="fas fa-weight"></i> <span>BMI</span>
+            </div>
+            <div class="nav-item" onclick="app.nav('contact')">
+                <i class="fas fa-address-book"></i> <span>ติดต่อเรา</span>
+            </div>
+        </nav>
+
+        <div id="home" class="page-section active">
+            <div class="text-center animate__animated animate__fadeInUp">
+                <h1 style="font-size: 3.5rem; margin-bottom: 20px; text-shadow: 0 0 30px var(--primary);">
+                    ยินดีต้อนรับเข้าสู่ห้องเรียน</h1>
+                <p style="font-size: 1.3rem; color: #ddd; max-width: 700px; margin: 0 auto 40px auto;">
+                    เรียนรู้ทักษะกีฬา การดูแลสุขภาพ โภชนาการ และการออกกำลังกายที่ถูกวิธี
+                    เพื่อสุขภาพร่างกายที่แข็งแรงสมบูรณ์
+                </p>
+                <img src="https://www.golftime.co.th/wp-content/uploads/2022/03/650316-Krukai-1-800x445.jpg"
+                    style="width: 100%; max-width: 800px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 2px solid var(--glass-border); margin-bottom: 40px;">
+                <br>
+                <button class="gradient-button" onclick="app.nav('lessons')">
+                    <span class="gradient-text">เริ่มบทเรียนทันที</span>
+                </button>
+            </div>
+        </div>
+
+        <div id="lessons" class="page-section">
+            <h2 style="border-left: 5px solid var(--accent); padding-left: 20px; margin-bottom: 30px; font-size: 2rem;">
+                📚 บทเรียนทั้งหมด (5 บท)
+            </h2>
+            <div class="lessons-container" id="lesson-grid">
+            </div>
+        </div>
+
+        <div id="lesson-reader" class="page-section">
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
+                <button class="gradient-button" onclick="app.nav('lessons')" style="padding: 10px 25px;">
+                    <span class="gradient-text"><i class="fas fa-arrow-left"></i> ย้อนกลับ</span>
+                </button>
+                <button class="gradient-button" id="tts-btn" onclick="tts.toggle()" style="padding: 10px 25px;">
+                    <span class="gradient-text"><i class="fas fa-volume-up"></i> อ่านออกเสียง</span>
+                </button>
+                <button class="gradient-button" onclick="tts.stop()" style="padding: 10px 25px;">
+                    <span class="gradient-text"><i class="fas fa-stop"></i> หยุดอ่าน</span>
+                </button>
+            </div>
+            <div id="tts-status"
+                style="margin-bottom: 15px; padding: 10px 20px; background: rgba(86,119,252,0.2); border-radius: 10px; display: none;">
+                <i class="fas fa-microphone-alt" style="color: var(--accent);"></i>
+                <span id="tts-status-text" style="margin-left: 10px; color: #fff;">กำลังอ่าน...</span>
+            </div>
+            <div class="reader-box animate__animated animate__fadeIn" id="reader-content">
+            </div>
+        </div>
+
+        <div id="videos" class="page-section">
+            <div class="text-center">
+                <h2 style="color: var(--primary-light); font-size: 2rem;">ห้องวิดีโอ 3D Carousel</h2>
+                <p style="color: #aaa;">กดปุ่ม < or> หรือลากเพื่อหมุนเลือกวิดีโอ</p>
+            </div>
+
+            <div class="carousel-stage">
+                <div class="carousel-spinner" id="carousel-spinner">
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="control-btn" onclick="carousel.rotate(1)"><i class="fas fa-chevron-left"></i></button>
+                <button class="control-btn" onclick="carousel.rotate(-1)"><i class="fas fa-chevron-right"></i></button>
+            </div>
+
+            <div id="video-player-modal" class="animate__animated animate__fadeInUp mt-20 hidden">
+                <div
+                    style="background: var(--glass); padding: 30px; border-radius: 20px; text-align: center; border: 1px solid var(--primary);">
+                    <h3 id="video-title" style="color: var(--accent); margin-bottom: 15px;">Video Title</h3>
+                    <!-- YouTube iframe will be inserted here by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <div id="quiz" class="page-section">
+            <div class="quiz-wrapper animate__animated animate__fadeIn">
+                <div id="quiz-start" class="text-center">
+                    <i class="fas fa-question-circle"
+                        style="font-size: 5rem; color: var(--primary); margin-bottom: 20px;"></i>
+                    <h2>แบบทดสอบวัดความรู้</h2>
+                    <p style="color: #aaa; margin-bottom: 30px;">จำนวน 20 ข้อ (เกณฑ์ผ่าน 50% หรือ 10 คะแนน)</p>
+                    <button class="gradient-button" onclick="quiz.start()">
+                        <span class="gradient-text">เริ่มทำแบบทดสอบ</span>
+                    </button>
+                </div>
+
+                <div id="quiz-game" class="hidden">
+                    <div class="quiz-header">
+                        <span id="quiz-progress-text">ข้อที่ 1 / 20</span>
+                        <span><i class="far fa-clock"></i> <span id="quiz-timer">00:00</span></span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="quiz-bar"></div>
+                    </div>
+
+                    <div class="question-text" id="question-text">คำถามจะอยู่ที่นี่...</div>
+
+                    <div class="options-grid" id="options-area">
+                    </div>
+
+                    <div style="margin-top: 30px; text-align: right;">
+                        <button class="gradient-button" onclick="quiz.next()" id="btn-next">
+                            <span class="gradient-text">ข้อถัดไป <i class="fas fa-arrow-right"></i></span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="quiz-result" class="hidden text-center">
+                    <h1 id="final-score" style="font-size: 4rem; color: var(--accent); margin-bottom: 10px;">0 / 20</h1>
+                    <h3 id="result-msg">ผลการสอบ</h3>
+                    <div id="pass-content" class="hidden">
+                        <p style="color: #4caf50; font-size: 1.2rem; margin-bottom: 20px;">ยินดีด้วย! คุณสอบผ่าน</p>
+                        <img id="certImage" class="animate__animated animate__tada">
+                        <br><br>
+                        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                            <button class="gradient-button" onclick="quiz.downloadCert()">
+                                <span class="gradient-text"><i class="fas fa-download"></i> ดาวน์โหลด</span>
+                            </button>
+                            <button class="gradient-button" onclick="quiz.emailCert()">
+                                <span class="gradient-text"><i class="fas fa-envelope"></i> ส่งอีเมล</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="fail-content" class="hidden">
+                        <p style="color: #ff5252; font-size: 1.2rem; margin-bottom: 20px;">เสียใจด้วย คุณยังไม่ผ่านเกณฑ์
+                        </p>
+                        <button class="gradient-button" onclick="quiz.reset()">
+                            <span class="gradient-text">ทำใหม่อีกครั้ง</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="bmi" class="page-section">
+            <div class="bmi-card animate__animated animate__zoomIn">
+                <h2 style="font-size: 2.2rem; margin-bottom: 30px; color: #fff;">เครื่องคำนวณ BMI</h2>
+                <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 30px;">
+                    <div style="text-align: left;">
+                        <label style="margin-left: 10px; color: #aaa;">น้ำหนัก (kg)</label>
+                        <input type="number" id="w-input" class="login-input" style="margin: 5px 0; width: 200px;"
+                            placeholder="0">
+                    </div>
+                    <div style="text-align: left;">
+                        <label style="margin-left: 10px; color: #aaa;">ส่วนสูง (cm)</label>
+                        <input type="number" id="h-input" class="login-input" style="margin: 5px 0; width: 200px;"
+                            placeholder="0">
+                    </div>
+                </div>
+
+                <button class="gradient-button" onclick="app.calcBMI()">
+                    <span class="gradient-text">คำนวณผลลัพธ์</span>
+                </button>
+
+                <div class="gauge-box">
+                    <div class="gauge-arc">
+                        <div class="gauge-color"></div>
+                        <div class="gauge-center">
+                            <h1 id="bmi-val" style="margin: 0; color: var(--accent); font-size: 2.5rem;">0.0</h1>
+                        </div>
+                    </div>
+                    <div class="needle" id="bmi-needle"></div>
+                </div>
+                <p id="bmi-text" style="font-size: 1.5rem; color: #fff;">กรอกข้อมูลเพื่อเริ่ม</p>
+
+                <table class="bmi-table"
+                    style="width: 100%; margin-top: 30px; background: rgba(0,0,0,0.3); border-radius: 10px; overflow: hidden; border-collapse: collapse;">
+                    <tr style="background: rgba(86,119,252,0.5); color: white;">
+                        <th style="padding: 10px;">BMI</th>
+                        <th style="padding: 10px;">ความหมาย</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; border-bottom: 1px solid #333;">
+                            < 18.5</td>
+                        <td style="color: #00e5ff;">ผอมเกินไป</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; border-bottom: 1px solid #333;">18.5 - 22.9</td>
+                        <td style="color: #00e676;">สมส่วน (ปกติ)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; border-bottom: 1px solid #333;">23 - 24.9</td>
+                        <td style="color: #ffea00;">น้ำหนักเกิน</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; border-bottom: 1px solid #333;">25 - 29.9</td>
+                        <td style="color: #ff9100;">อ้วนระดับ 1</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px;">> 30</td>
+                        <td style="color: #ff1744;">อ้วนระดับ 2</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div id="contact" class="page-section">
+            <div class="text-center mb-20">
+                <h1 style="font-size: 3rem;">ติดต่อเรา</h1>
+                <p style="color: #aaa;">สอบถามข้อมูลเพิ่มเติมได้ตามช่องทางด้านล่าง</p>
+            </div>
+            <div class="contact-grid">
+                <a href="https://facebook.com" target="_blank" class="neon-card-link">
+                    <div class="neon-contact">
+                        <div class="neon-inner">
+                            <i class="fab fa-facebook fa-3x" style="color: #1877f2;"></i>
+                            <div>
+                                <div style="color: #888; font-size: 0.9rem;">Facebook Fanpage</div>
+                                <div style="font-weight: bold; font-size: 1.2rem; color: #fff;">PE E-Learning</div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                <a href="https://line.me" target="_blank" class="neon-card-link">
+                    <div class="neon-contact">
+                        <div class="neon-inner">
+                            <i class="fab fa-line fa-3x" style="color: #00c300;"></i>
+                            <div>
+                                <div style="color: #888; font-size: 0.9rem;">Line Official</div>
+                                <div style="font-weight: bold; font-size: 1.2rem; color: #fff;">@PE_Class_Online</div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                <a href="https://instagram.com" target="_blank" class="neon-card-link">
+                    <div class="neon-contact">
+                        <div class="neon-inner">
+                            <i class="fab fa-instagram fa-3x" style="color: #e1306c;"></i>
+                            <div>
+                                <div style="color: #888; font-size: 0.9rem;">Instagram</div>
+                                <div style="font-weight: bold; font-size: 1.2rem; color: #fff;">PE_Official_TH</div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                <a href="tel:0999999999" class="neon-card-link">
+                    <div class="neon-contact">
+                        <div class="neon-inner">
+                            <i class="fas fa-phone-alt fa-3x" style="color: var(--primary);"></i>
+                            <div>
+                                <div style="color: #888; font-size: 0.9rem;">เบอร์โทรศัพท์</div>
+                                <div style="font-weight: bold; font-size: 1.2rem; color: #fff;">099-999-9999</div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+    </div> <canvas id="certCanvas" width="800" height="600"></canvas>
+
+    <script>
+        /* =========================================
+           DATA: LESSON CONTENT (FULL)
+           ========================================= */
+        const lessons = [
+            {
+                id: 1, title: "บทที่ 1: สุขภาพและการป้องกันโรค",
+                img: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=500",
+                html: `
+                    <h3>หลักการดูแลสุขภาพทั่วไป แบ่งออกเป็น 3 ระยะ</h3>
+                    <ul>
+                        <li><b>1) ก่อนเกิดโรค (การป้องกันโรคปฐมภูมิ):</b>
+                            <ul>
+                                <li>การส่งเสริมสุขภาพร่างกาย: คือ การดูแลรักษาร่างกายให้สมบูรณ์แข็งแรงอยู่เสมอและสามารถต้านทานโรคภัยไข้เจ็บได้</li>
+                                <li>การส่งเสริมสุขภาพจิต: การดูแลรักษาจิตใจให้สมบูรณ์เป็นปกติ</li>
+                            </ul>
+                        </li>
+                        <li><b>2) ระยะเจ็บป่วย (การป้องกันโรคทุติยภูมิ):</b>
+                            <ul><li>การวินิจฉัยโรคตั้งแต่เริ่มต้นและให้รับการรักษาทันที เมื่อมีความผิดปกติเกิดขึ้นควรรีบไปพบแพทย์</li></ul>
+                        </li>
+                        <li><b>3) ระยะหลังการเจ็บป่วย (การป้องกันโรคตติยภูมิ):</b>
+                            <ul><li>การฟื้นฟูสมรรถภาพด้วยวิธีบำบัดต่างๆ เพื่อป้องกันไม่ให้ผู้ป่วยกลายเป็นบุคคลไร้สมรรถภาพ</li></ul>
+                        </li>
+                    </ul>
+                    <h3>การป้องกันโรค 3 ส่วน</h3>
+                    <ol>
+                        <li><b>สุขอนามัยพื้นฐาน:</b> ล้างมือ 20 วินาที, กินร้อนช้อนกลาง, สวมหน้ากาก</li>
+                        <li><b>เสริมภูมิคุ้มกัน:</b> ออกกำลังกาย, อาหาร 5 หมู่, พักผ่อน, วัคซีน</li>
+                        <li><b>ควบคุมพาหะ:</b> กำจัดแหล่งเพาะพันธุ์ยุง, ฉีดวัคซีนสัตว์เลี้ยง</li>
+                    </ol>
+                `
+            },
+            {
+                id: 2, title: "บทที่ 2: ความอ้วนและการควบคุม",
+                img: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=500",
+                html: `
+                    <h3>ความอ้วน</h3>
+                    <p>บั่นทอนสุขภาพ เป็นปัจจัยเสี่ยงโรคเบาหวาน ไขมันสูง ความดันสูง โรคหัวใจ สาเหตุหลักคือการกินมากเกินไปและไม่ออกกำลังกาย</p>
+                    <h3>การป้องกัน 3 ประการ</h3>
+                    <ul>
+                        <li><b>1. คุมอาหาร:</b> ลดแป้ง น้ำตาล ไขมัน กะทิ กินมื้อหลักให้ครบ 3 มื้อ ห้ามอด</li>
+                        <li><b>2. ออกกำลังกาย:</b> อย่างน้อยสัปดาห์ละ 3 ครั้ง ครั้งละ 20-30 นาที ลดเวลานั่งหน้าจอ</li>
+                        <li><b>3. ปรับพฤติกรรม:</b> ลดสิ่งกระตุ้นความอยาก, ตั้งเป้าหมายน้ำหนัก, งดกินจุกจิกมื้อดึก</li>
+                    </ul>
+                `
+            },
+            {
+                id: 3, title: "บทที่ 3: สุขภาพผู้สูงอายุ",
+                img: "https://images.unsplash.com/photo-1581056771107-24ca5f033842?w=500",
+                html: `
+                    <h3>การวัดอุณหภูมิ</h3>
+                    <ul>
+                        <li><b>ทางปาก:</b> อมใต้ลิ้น 3-5 นาที (นิยมสุด)</li>
+                        <li><b>ทางรักแร้:</b> หนีบ 3-5 นาที (ใช้กับเด็ก/ผู้ป่วยไม่รู้สึกตัว)</li>
+                        <li><b>ทางทวาร:</b> ใช้กับทารก</li>
+                    </ul>
+                    <h3>อาหารผู้สูงอายุ</h3>
+                    <ul>
+                        <li><b>เนื้อสัตว์:</b> ปลาและไก่ (ย่อยง่าย) ระวังก้าง</li>
+                        <li><b>ผักผลไม้:</b> ต้ม/นึ่งให้สุก ผลไม้เนื้อนุ่ม</li>
+                        <li><b>น้ำดื่ม:</b> 6-8 แก้วต่อวัน</li>
+                    </ul>
+                    <h3>ประโยชน์ออกกำลังกาย</h3>
+                    <p>กายแข็งแรง, จิตแจ่มใส (ลดเครียด), สังคมดี (สร้างมิตรภาพ)</p>
+                `
+            },
+            {
+                id: 4, title: "บทที่ 4: กติกาฟุตบอล",
+                img: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=500",
+                html: `
+                    <h3>กติกาพื้นฐาน</h3>
+                    <ul>
+                        <li><b>ผู้เล่น:</b> สูงสุด 11 คน (รวมประตู)</li>
+                        <li><b>เวลา:</b> 2 ครึ่ง ครึ่งละ 45 นาที (พัก 15 นาที)</li>
+                        <li><b>แฮนด์บอล:</b> ห้ามใช้มือ/แขน (ยกเว้นประตูในเขต)</li>
+                        <li><b>ล้ำหน้า (Offside):</b> อยู่ต่ำกว่ากองหลังตัวรองสุดท้ายตอนเพื่อนส่งบอล</li>
+                        <li><b>โทษ:</b> ใบเหลือง (เตือน) / ใบแดง (ไล่ออก/เหลือง 2 ใบ)</li>
+                    </ul>
+                `
+            },
+            {
+                id: 5, title: "บทที่ 5: อาหาร 5 หมู่",
+                img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500",
+                html: `
+                    <h3>สารอาหารหลัก</h3>
+                    <ol>
+                        <li><b>โปรตีน (เนื้อ นม ไข่):</b> ซ่อมแซมร่างกาย สร้างกล้ามเนื้อ</li>
+                        <li><b>คาร์โบไฮเดรต (แป้ง ข้าว):</b> แหล่งพลังงานหลัก</li>
+                        <li><b>เกลือแร่ (ผัก):</b> สร้างกระดูก (แคลเซียม), เลือด (เหล็ก)</li>
+                        <li><b>วิตามิน (ผลไม้):</b> ภูมิคุ้มกัน (Vit C), บำรุงผิว</li>
+                        <li><b>ไขมัน:</b> ให้พลังงานสูง, ความอบอุ่น</li>
+                    </ol>
+                `
+            }
+        ];
+
+        /* =========================================
+           DATA: QUIZ QUESTIONS (20 ITEMS)
+           ========================================= */
+        const questions = [
+            { q: "การดูแลร่างกายก่อนเกิดโรค เรียกว่าอะไร?", a: ["ปฐมภูมิ", "ทุติยภูมิ", "ตติยภูมิ", "จตุรภูมิ"], c: 0 },
+            { q: "การวินิจฉัยและรักษาทันที อยู่ในระยะใด?", a: ["ก่อนเกิดโรค", "ระยะเจ็บป่วย", "หลังเจ็บป่วย", "ระยะฟื้นฟู"], c: 1 },
+            { q: "การฟื้นฟูสมรรถภาพ คือระยะใด?", a: ["ปฐมภูมิ", "ทุติยภูมิ", "ตติยภูมิ", "ระยะติดต่อ"], c: 2 },
+            { q: "สาเหตุหลักของความอ้วนคือ?", a: ["กรรมพันธุ์", "เชื้อโรค", "พฤติกรรมการกิน", "อากาศ"], c: 2 },
+            { q: "ข้อใดถูกต้องเกี่ยวกับการลดน้ำหนัก?", a: ["อดมื้อเช้า", "อดมื้อเย็น", "ไม่อดมื้อหลัก", "กินยา"], c: 2 },
+            { q: "ควรออกกำลังกายอย่างน้อยสัปดาห์ละกี่ครั้ง?", a: ["1", "2", "3", "ทุกวัน"], c: 2 },
+            { q: "การวัดอุณหภูมิทางใดนิยมที่สุด?", a: ["รักแร้", "ปาก", "ทวาร", "หู"], c: 1 },
+            { q: "อาหารที่เหมาะกับผู้สูงอายุ?", a: ["ของทอด", "รสจัด", "เนื้อเหนียว", "ปลา/ไก่นุ่ม"], c: 3 },
+            { q: "ผู้สูงอายุควรดื่มน้ำวันละกี่แก้ว?", a: ["2-3", "4-5", "6-8", "10+"], c: 2 },
+            { q: "สารความสุขขณะออกกำลังกาย?", a: ["Adrenaline", "Endorphins", "Insulin", "Cortisol"], c: 1 },
+            { q: "ฟุตบอล 1 ทีมมีกี่คน?", a: ["7", "9", "11", "15"], c: 2 },
+            { q: "เวลาแข่งฟุตบอลครึ่งละกี่นาที?", a: ["30", "40", "45", "90"], c: 2 },
+            { q: "อวัยวะใดไม่นับล้ำหน้า?", a: ["เท้า", "ศีรษะ", "หน้าอก", "แขน/มือ"], c: 3 },
+            { q: "ใบแดง หมายถึง?", a: ["เตือน", "ไล่ออก", "พัก 5 นาที", "ยิงโทษ"], c: 1 },
+            { q: "บอลออกหลังโดยฝ่ายรับ เริ่มเล่นยังไง?", a: ["ทุ่ม", "เตะมุม", "จากประตู", "ฟรีคิก"], c: 1 },
+            { q: "หน้าที่หลักโปรตีน?", a: ["พลังงาน", "ซ่อมแซมร่างกาย", "อบอุ่น", "ขับถ่าย"], c: 1 },
+            { q: "แหล่งพลังงานหลักของร่างกาย?", a: ["โปรตีน", "คาร์บ", "วิตามิน", "เกลือแร่"], c: 1 },
+            { q: "ไขมัน 1g ให้พลังงาน?", a: ["4", "5", "7", "9"], c: 3 },
+            { q: "Vit C ช่วยเรื่อง?", a: ["ตา", "กระดูก", "ภูมิคุ้มกัน", "เลือด"], c: 2 },
+            { q: "ล้างมืออย่างน้อยกี่วิ?", a: ["5", "10", "20", "60"], c: 2 }
+        ];
+
+        /* =========================================
+           SOUND EFFECTS MODULE
+           ========================================= */
+        const sfx = {
+            audioCtx: null,
+
+            init: () => {
+                sfx.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            },
+
+            // เสียงคลิกปุ่มทั่วไป
+            click: () => {
+                if (!sfx.audioCtx) sfx.init();
+                const ctx = sfx.audioCtx;
+                const oscillator = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(ctx.destination);
+
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+                gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+
+                oscillator.start(ctx.currentTime);
+                oscillator.stop(ctx.currentTime + 0.1);
+            },
+
+            // เสียงเลือกตัวเลือก
+            select: () => {
+                if (!sfx.audioCtx) sfx.init();
+                const ctx = sfx.audioCtx;
+                const oscillator = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(ctx.destination);
+
+                oscillator.frequency.value = 600;
+                oscillator.type = 'triangle';
+                gainNode.gain.setValueAtTime(0.2, ctx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+
+                oscillator.start(ctx.currentTime);
+                oscillator.stop(ctx.currentTime + 0.08);
+            },
+
+            // เสียงสำเร็จ
+            success: () => {
+                if (!sfx.audioCtx) sfx.init();
+                const ctx = sfx.audioCtx;
+
+                const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
+                notes.forEach((freq, i) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    osc.frequency.value = freq;
+                    osc.type = 'sine';
+                    gain.gain.setValueAtTime(0.2, ctx.currentTime + i * 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.1 + 0.3);
+
+                    osc.start(ctx.currentTime + i * 0.1);
+                    osc.stop(ctx.currentTime + i * 0.1 + 0.3);
+                });
+            },
+
+            // เสียงผิดพลาด
+            error: () => {
+                if (!sfx.audioCtx) sfx.init();
+                const ctx = sfx.audioCtx;
+                const oscillator = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(ctx.destination);
+
+                oscillator.frequency.value = 200;
+                oscillator.type = 'sawtooth';
+                gainNode.gain.setValueAtTime(0.2, ctx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+
+                oscillator.start(ctx.currentTime);
+                oscillator.stop(ctx.currentTime + 0.3);
+            },
+
+            // เสียงเปลี่ยนหน้า
+            navigate: () => {
+                if (!sfx.audioCtx) sfx.init();
+                const ctx = sfx.audioCtx;
+                const oscillator = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(ctx.destination);
+
+                oscillator.frequency.setValueAtTime(400, ctx.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.1);
+                oscillator.type = 'sine';
+                gainNode.gain.setValueAtTime(0.15, ctx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+
+                oscillator.start(ctx.currentTime);
+                oscillator.stop(ctx.currentTime + 0.15);
+            }
+        };
+
+        // เพิ่มเสียงให้ปุ่มทั้งหมดอัตโนมัติ
+        document.addEventListener('DOMContentLoaded', () => {
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.gradient-button')) {
+                    sfx.click();
+                } else if (e.target.closest('.nav-item')) {
+                    sfx.navigate();
+                } else if (e.target.closest('.option-btn')) {
+                    sfx.select();
+                } else if (e.target.closest('.lesson-card') || e.target.closest('.vid-card')) {
+                    sfx.click();
+                } else if (e.target.closest('.control-btn')) {
+                    sfx.click();
+                }
+            });
+        });
+
+        /* =========================================
+           APP LOGIC (SINGLETON PATTERN)
+           ========================================= */
+        const app = {
+            user: null,
+            init: () => {
+                // Remove Preloader
+                setTimeout(() => {
+                    document.getElementById('preloader').style.opacity = 0;
+                    setTimeout(() => document.getElementById('preloader').remove(), 500);
+                }, 1000);
+
+                // Init Background
+                particleBg.init();
+
+                // Check LocalStorage
+                const savedUser = localStorage.getItem('pe_user');
+                if (savedUser) {
+                    document.getElementById('username-input').value = savedUser;
+                }
+
+                app.renderLessons();
+                carousel.init();
+            },
+
+            login: () => {
+                const name = document.getElementById('username-input').value.trim();
+                if (!name) return Swal.fire({ icon: 'warning', title: 'แจ้งเตือน', text: 'กรุณากรอกชื่อก่อนเข้าใช้งาน' });
+
+                app.user = name;
+                localStorage.setItem('pe_user', name);
+                document.getElementById('display-name').innerText = name;
+
+                document.getElementById('login-screen').classList.add('animate__animated', 'animate__fadeOutUp');
+                setTimeout(() => {
+                    document.getElementById('login-screen').classList.add('hidden');
+                    document.getElementById('app').style.display = 'block';
+                    document.getElementById('app').classList.add('animate__animated', 'animate__fadeInUp');
+                    AOS.init();
+                }, 800);
+            },
+
+            logout: () => location.reload(),
+
+            nav: (page) => {
+                document.querySelectorAll('.page-section').forEach(el => {
+                    el.classList.remove('active');
+                    el.classList.remove('animate__fadeIn');
+                });
+                const target = document.getElementById(page);
+                target.classList.add('active', 'animate__animated', 'animate__fadeIn');
+
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                const map = ['home', 'lessons', 'videos', 'quiz', 'bmi', 'contact'];
+                if (map.includes(page)) {
+                    document.querySelectorAll('.nav-item')[map.indexOf(page)].classList.add('active');
+                }
+
+                if (page !== 'videos') {
+                    const iframe = document.getElementById('main-video');
+                    if (iframe) iframe.remove();
+                    document.getElementById('video-player-modal').classList.add('hidden');
+                }
+
+                // หยุดอ่านเมื่อออกจากหน้าบทเรียน
+                if (page !== 'lesson-reader' && typeof tts !== 'undefined') {
+                    tts.stop();
+                }
+            },
+
+            renderLessons: () => {
+                const grid = document.getElementById('lesson-grid');
+                grid.innerHTML = lessons.map(l => `
+                    <div class="lesson-card" onclick="app.readLesson(${l.id})">
+                        <img src="${l.img}" class="lesson-thumb">
+                        <div class="lesson-info">
+                            <div class="lesson-title">${l.title}</div>
+                            <div style="font-size: 0.9rem; color: #888;">คลิกเพื่ออ่านเนื้อหาฉบับเต็ม</div>
+                        </div>
+                    </div>
+                `).join('');
+            },
+
+            readLesson: (id) => {
+                const l = lessons.find(x => x.id === id);
+                const reader = document.getElementById('reader-content');
+                reader.innerHTML = `<h1>${l.title}</h1><img src="${l.img}" style="width:100%; height:350px; object-fit:cover; border-radius:20px; margin-bottom:30px;">${l.html}`;
+                app.nav('lesson-reader');
+                window.scrollTo(0, 0);
+            },
+
+            calcBMI: () => {
+                const w = parseFloat(document.getElementById('w-input').value);
+                const h = parseFloat(document.getElementById('h-input').value);
+                if (!w || !h) return Swal.fire('Error', 'กรุณากรอกข้อมูลให้ครบ', 'error');
+
+                const bmi = (w / ((h / 100) ** 2)).toFixed(2);
+                let st = "", col = "", deg = -90;
+
+                // Gauge แบ่ง 5 ช่วง ครอบคลุม -90° ถึง 90° (180° ทั้งหมด)
+                // แต่ละช่วง = 36° (180/5)
+                // ช่วง 1: ผอม (-90 ถึง -54) | ช่วง 2: ปกติ (-54 ถึง -18) | ช่วง 3: ท้วม (-18 ถึง 18)
+                // ช่วง 4: อ้วน1 (18 ถึง 54) | ช่วง 5: อ้วน2 (54 ถึง 90)
+
+                if (bmi < 18.5) {
+                    st = "ผอม";
+                    col = "#00e5ff";
+                    // BMI 10-18.5 → -90° ถึง -54°
+                    deg = -90 + (Math.min(bmi, 18.5) / 18.5) * 36;
+                }
+                else if (bmi < 23) {
+                    st = "ปกติ";
+                    col = "#00e676";
+                    // BMI 18.5-23 → -54° ถึง -18°
+                    deg = -54 + ((bmi - 18.5) / 4.5) * 36;
+                }
+                else if (bmi < 25) {
+                    st = "ท้วม";
+                    col = "#ffea00";
+                    // BMI 23-25 → -18° ถึง 18°
+                    deg = -18 + ((bmi - 23) / 2) * 36;
+                }
+                else if (bmi < 30) {
+                    st = "อ้วน 1";
+                    col = "#ff9100";
+                    // BMI 25-30 → 18° ถึง 54°
+                    deg = 18 + ((bmi - 25) / 5) * 36;
+                }
+                else {
+                    st = "อ้วน 2";
+                    col = "#ff1744";
+                    // BMI 30+ → 54° ถึง 90°
+                    deg = 54 + Math.min(((bmi - 30) / 10) * 36, 36);
+                }
+
+                document.getElementById('bmi-val').innerText = bmi;
+                document.getElementById('bmi-val').style.color = col;
+                document.getElementById('bmi-text').innerHTML = `ผลลัพธ์: <span style="color:${col}; font-weight:bold;">${st}</span>`;
+
+                const needle = document.getElementById('bmi-needle');
+                needle.style.transform = `translateX(-50%) rotate(${deg}deg)`;
+                needle.style.background = col;
+                needle.style.boxShadow = `0 0 15px ${col}`;
+            }
+        };
+
+        /* =========================================
+           TEXT-TO-SPEECH MODULE
+           ========================================= */
+        const tts = {
+            synth: window.speechSynthesis,
+            utterance: null,
+            isPlaying: false,
+
+            toggle: () => {
+                if (tts.isPlaying) {
+                    tts.pause();
+                } else {
+                    tts.speak();
+                }
+            },
+
+            speak: () => {
+                // หยุดการอ่านเดิมก่อน
+                tts.synth.cancel();
+
+                // ดึงเนื้อหาจาก reader
+                const readerContent = document.getElementById('reader-content');
+                if (!readerContent) return;
+
+                // แปลง HTML เป็น text และทำความสะอาด
+                let text = readerContent.innerText;
+                text = text.replace(/\s+/g, ' ').trim();
+
+                if (!text) {
+                    Swal.fire('แจ้งเตือน', 'ไม่พบเนื้อหาที่จะอ่าน', 'warning');
+                    return;
+                }
+
+                // สร้าง utterance
+                tts.utterance = new SpeechSynthesisUtterance(text);
+                tts.utterance.lang = 'th-TH'; // ภาษาไทย
+                tts.utterance.rate = 0.9; // ความเร็ว (0.1 - 10)
+                tts.utterance.pitch = 1; // ระดับเสียง (0 - 2)
+
+                // หาเสียงภาษาไทย
+                const voices = tts.synth.getVoices();
+                const thaiVoice = voices.find(v => v.lang.includes('th'));
+                if (thaiVoice) {
+                    tts.utterance.voice = thaiVoice;
+                }
+
+                // Events
+                tts.utterance.onstart = () => {
+                    tts.isPlaying = true;
+                    tts.updateStatus(true, 'กำลังอ่านบทเรียน...');
+                    tts.updateButton(true);
+                };
+
+                tts.utterance.onend = () => {
+                    tts.isPlaying = false;
+                    tts.updateStatus(false);
+                    tts.updateButton(false);
+                };
+
+                tts.utterance.onerror = (e) => {
+                    console.error('TTS Error:', e);
+                    tts.isPlaying = false;
+                    tts.updateStatus(false);
+                    tts.updateButton(false);
+                };
+
+                // เริ่มอ่าน
+                tts.synth.speak(tts.utterance);
+            },
+
+            pause: () => {
+                if (tts.synth.speaking) {
+                    tts.synth.pause();
+                    tts.isPlaying = false;
+                    tts.updateStatus(true, 'หยุดพักชั่วคราว - กดอ่านต่อ');
+                    tts.updateButton(false);
+                }
+            },
+
+            resume: () => {
+                if (tts.synth.paused) {
+                    tts.synth.resume();
+                    tts.isPlaying = true;
+                    tts.updateStatus(true, 'กำลังอ่านต่อ...');
+                    tts.updateButton(true);
+                }
+            },
+
+            stop: () => {
+                tts.synth.cancel();
+                tts.isPlaying = false;
+                tts.updateStatus(false);
+                tts.updateButton(false);
+            },
+
+            updateStatus: (show, text = '') => {
+                const statusEl = document.getElementById('tts-status');
+                const statusText = document.getElementById('tts-status-text');
+                if (statusEl) {
+                    statusEl.style.display = show ? 'block' : 'none';
+                    if (text) statusText.innerText = text;
+                }
+            },
+
+            updateButton: (isPlaying) => {
+                const btn = document.getElementById('tts-btn');
+                if (btn) {
+                    if (isPlaying) {
+                        btn.innerHTML = '<span class="gradient-text"><i class="fas fa-pause"></i> หยุดพัก</span>';
+                    } else {
+                        btn.innerHTML = '<span class="gradient-text"><i class="fas fa-volume-up"></i> อ่านออกเสียง</span>';
+                    }
+                }
+            }
+        };
+
+        // โหลดเสียงเมื่อพร้อม
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = () => { };
+        }
+
+        /* =========================================
+           CAROUSEL LOGIC
+           ========================================= */
+        const carousel = {
+            items: [
+                { t: "วอร์มอัพก่อนออกกำลังกาย", v: "https://www.youtube.com/embed/d0KYSKgLkA0" },
+                { t: "ลดไขมันทั้งตัว", v: "https://www.youtube.com/embed/IzonmedVyAU" },
+                { t: "ออกกำลังกายหน้าท้อง", v: "https://www.youtube.com/embed/mzfc4Yu7TT0" },
+                { t: "ท่าบริหารกล้ามเนื้อผู้สูงอายุ", v: "https://www.youtube.com/embed/F5lf_Lr4G_g" },
+                { t: "ท่าบริหารง่ายๆ ที่บ้าน", v: "https://www.youtube.com/embed/tmDCD86PDBQ" }
+            ],
+            currDeg: 0,
+            init: () => {
+                const spinner = document.getElementById('carousel-spinner');
+                const angle = 360 / carousel.items.length;
+                carousel.items.forEach((item, i) => {
+                    const el = document.createElement('div');
+                    el.className = 'vid-card';
+                    el.style.transform = `rotateY(${i * angle}deg) translateZ(350px)`;
+                    el.innerHTML = `<i class="fas fa-play-circle"></i><div>${item.t}</div>`;
+                    el.onclick = () => carousel.play(item);
+                    spinner.appendChild(el);
+                });
+                // Drag Events
+                const stage = document.querySelector('.carousel-stage');
+                let isDown = false, startX;
+                stage.addEventListener('mousedown', e => { isDown = true; startX = e.pageX; stage.style.cursor = 'grabbing'; });
+                stage.addEventListener('mouseup', () => { isDown = false; stage.style.cursor = 'grab'; });
+                stage.addEventListener('mouseleave', () => { isDown = false; stage.style.cursor = 'grab'; });
+                stage.addEventListener('mousemove', e => {
+                    if (!isDown) return;
+                    e.preventDefault();
+                    carousel.currDeg += (e.pageX - startX) * 0.2;
+                    spinner.style.transform = `rotateY(${carousel.currDeg}deg)`;
+                    startX = e.pageX;
+                });
+            },
+            rotate: (dir) => {
+                const spinner = document.getElementById('carousel-spinner');
+                const angle = 360 / carousel.items.length;
+                carousel.currDeg += (dir * angle);
+                spinner.style.transform = `rotateY(${carousel.currDeg}deg)`;
+            },
+            play: (item) => {
+                document.getElementById('video-player-modal').classList.remove('hidden');
+                document.getElementById('video-title').innerText = item.t;
+                const container = document.getElementById('video-player-modal').querySelector('div');
+                // Remove old video element if exists
+                const oldVideo = document.getElementById('main-video');
+                if (oldVideo) oldVideo.remove();
+                // Create YouTube iframe
+                const iframe = document.createElement('iframe');
+                iframe.id = 'main-video';
+                iframe.src = item.v + '?autoplay=1';
+                iframe.style.cssText = 'width: 100%; max-width: 800px; height: 450px; border-radius: 15px; box-shadow: 0 0 30px rgba(0,0,0,0.5); border: none;';
+                iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+                iframe.allowFullscreen = true;
+                container.appendChild(iframe);
+                container.scrollIntoView({ behavior: "smooth" });
+            }
+        };
+
+        /* =========================================
+           QUIZ ENGINE
+           ========================================= */
+        const quiz = {
+            currentIdx: 0,
+            score: 0,
+            timer: null,
+            timeElapsed: 0,
+            answers: [],
+
+            start: () => {
+                quiz.currentIdx = 0;
+                quiz.score = 0;
+                quiz.answers = new Array(questions.length).fill(null);
+                document.getElementById('quiz-start').classList.add('hidden');
+                document.getElementById('quiz-game').classList.remove('hidden');
+                quiz.loadQuestion();
+                quiz.startTimer();
+            },
+
+            startTimer: () => {
+                quiz.timeElapsed = 0;
+                clearInterval(quiz.timer);
+                quiz.timer = setInterval(() => {
+                    quiz.timeElapsed++;
+                    const m = Math.floor(quiz.timeElapsed / 60).toString().padStart(2, '0');
+                    const s = (quiz.timeElapsed % 60).toString().padStart(2, '0');
+                    document.getElementById('quiz-timer').innerText = `${m}:${s}`;
+                }, 1000);
+            },
+
+            loadQuestion: () => {
+                const q = questions[quiz.currentIdx];
+                document.getElementById('quiz-progress-text').innerText = `ข้อที่ ${quiz.currentIdx + 1} / ${questions.length}`;
+                document.getElementById('quiz-bar').style.width = `${((quiz.currentIdx + 1) / questions.length) * 100}%`;
+                document.getElementById('question-text').innerText = q.q;
+
+                const area = document.getElementById('options-area');
+                area.innerHTML = '';
+                q.a.forEach((opt, i) => {
+                    const btn = document.createElement('div');
+                    btn.className = 'option-btn';
+                    btn.innerText = opt;
+                    if (quiz.answers[quiz.currentIdx] === i) btn.classList.add('selected');
+                    btn.onclick = () => quiz.selectOption(i, btn);
+                    area.appendChild(btn);
+                });
+
+                // Button Text
+                const btnNext = document.getElementById('btn-next');
+                if (quiz.currentIdx === questions.length - 1) {
+                    btnNext.innerHTML = '<span class="gradient-text">ส่งคำตอบ</span>';
+                } else {
+                    btnNext.innerHTML = '<span class="gradient-text">ข้อถัดไป <i class="fas fa-arrow-right"></i></span>';
+                }
+            },
+
+            selectOption: (idx, el) => {
+                document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+                el.classList.add('selected');
+                quiz.answers[quiz.currentIdx] = idx;
+            },
+
+            next: () => {
+                if (quiz.answers[quiz.currentIdx] === null || quiz.answers[quiz.currentIdx] === undefined) {
+                    return Swal.fire('เดี๋ยวก่อน', 'กรุณาเลือกคำตอบก่อนไปต่อ', 'warning');
+                }
+
+                if (quiz.currentIdx < questions.length - 1) {
+                    quiz.currentIdx++;
+                    quiz.loadQuestion();
+                } else {
+                    quiz.finish();
+                }
+            },
+
+            finish: () => {
+                clearInterval(quiz.timer);
+                quiz.score = 0;
+                questions.forEach((q, i) => {
+                    if (quiz.answers[i] === q.c) quiz.score++;
+                });
+
+                document.getElementById('quiz-game').classList.add('hidden');
+                document.getElementById('quiz-result').classList.remove('hidden');
+                document.getElementById('final-score').innerText = `${quiz.score} / 20`;
+
+                if (quiz.score >= 10) {
+                    document.getElementById('result-msg').innerText = "ผ่านการทดสอบ!";
+                    document.getElementById('result-msg').style.color = "#00e676";
+                    document.getElementById('pass-content').classList.remove('hidden');
+                    document.getElementById('fail-content').classList.add('hidden');
+
+                    quiz.genCert();
+                    confettiEffect();
+                } else {
+                    document.getElementById('result-msg').innerText = "ยังไม่ผ่านเกณฑ์";
+                    document.getElementById('result-msg').style.color = "#ff1744";
+                    document.getElementById('pass-content').classList.add('hidden');
+                    document.getElementById('fail-content').classList.remove('hidden');
+                }
+            },
+
+            reset: () => {
+                document.getElementById('quiz-result').classList.add('hidden');
+                document.getElementById('quiz-start').classList.remove('hidden');
+            },
+
+            genCert: () => {
+                const cvs = document.getElementById('certCanvas');
+                const ctx = cvs.getContext('2d');
+                // Canvas Drawing
+                ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, 800, 600);
+                // Border
+                ctx.lineWidth = 15; ctx.strokeStyle = "#5677fc"; ctx.strokeRect(20, 20, 760, 560);
+                ctx.lineWidth = 3; ctx.strokeStyle = "#daa520"; ctx.strokeRect(35, 35, 730, 530);
+                // Text
+                ctx.textAlign = "center";
+                ctx.font = "bold 50px 'Prompt'"; ctx.fillStyle = "#2a36b1"; ctx.fillText("เกียรติบัตร", 400, 120);
+                ctx.font = "30px 'Prompt'"; ctx.fillStyle = "#555"; ctx.fillText("ขอมอบให้ไว้เพื่อแสดงว่า", 400, 200);
+                ctx.font = "bold 60px 'Prompt'"; ctx.fillStyle = "#daa520"; ctx.fillText(app.user || "Guest", 400, 280);
+                ctx.font = "25px 'Prompt'"; ctx.fillStyle = "#333"; ctx.fillText("ได้ผ่านการทดสอบวิชาพละศึกษาออนไลน์", 400, 350);
+                ctx.fillText(`คะแนนสอบ: ${quiz.score} / 20`, 400, 400);
+
+                const date = new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' });
+                ctx.font = "20px 'Prompt'"; ctx.fillStyle = "#888"; ctx.fillText(`ให้ไว้ ณ วันที่ ${date}`, 400, 500);
+
+                // Signature Line
+                ctx.beginPath(); ctx.moveTo(250, 530); ctx.lineTo(550, 530); ctx.stroke();
+                ctx.font = "18px 'Prompt'"; ctx.fillText("( ครูผู้สอนวิชาพละศึกษา )", 400, 560);
+
+                document.getElementById('certImage').src = cvs.toDataURL();
+            },
+
+            downloadCert: () => {
+                const link = document.createElement('a');
+                link.download = `Certificate_${app.user}.png`;
+                link.href = document.getElementById('certCanvas').toDataURL();
+                link.click();
+            },
+
+            emailCert: async () => {
+                // ขอที่อยู่อีเมลจากผู้ใช้
+                const { value: email } = await Swal.fire({
+                    title: '📧 ส่งเกียรติบัตรทางอีเมล',
+                    input: 'email',
+                    inputLabel: 'กรอกอีเมลของคุณ',
+                    inputPlaceholder: 'example@email.com',
+                    showCancelButton: true,
+                    confirmButtonText: 'ส่งอีเมล',
+                    cancelButtonText: 'ยกเลิก',
+                    inputValidator: (value) => {
+                        if (!value) {
+                            return 'กรุณากรอกอีเมล';
+                        }
+                        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                            return 'รูปแบบอีเมลไม่ถูกต้อง';
+                        }
+                    }
+                });
+
+                if (email) {
+                    // สร้างข้อมูลสำหรับส่ง
+                    const certData = document.getElementById('certCanvas').toDataURL('image/png');
+                    const userName = app.user || 'นักเรียน';
+                    const score = quiz.score;
+                    const date = new Date().toLocaleDateString('th-TH', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+
+                    // สร้างเนื้อหาอีเมล
+                    const subject = encodeURIComponent(`เกียรติบัตรผ่านการทดสอบวิชาพละศึกษา - ${userName}`);
+                    const body = encodeURIComponent(
+                        `สวัสดีค่ะ/ครับ ${userName},
+
+ขอแสดงความยินดี! คุณได้ผ่านการทดสอบวิชาพละศึกษาออนไลน์แล้ว
+
+📊 ผลการสอบ:
+- ชื่อ: ${userName}
+- คะแนน: ${score}/20 คะแนน
+- วันที่สอบ: ${date}
+
+🏆 เกียรติบัตรของคุณแนบมาในรูปแบบไฟล์ภาพ
+(กรุณาดาวน์โหลดเกียรติบัตรจากเว็บไซต์และแนบไฟล์มาในอีเมลนี้)
+
+ขอบคุณที่ใช้บริการ PE E-Learning
+---
+PE Class Online Learning Platform`
+                    );
+
+                    // เปิดแอปอีเมล
+                    const mailtoLink = `mailto:${email}?subject=${subject}&body=${body}`;
+                    window.open(mailtoLink, '_blank');
+
+                    // แจ้งเตือนให้ดาวน์โหลดและแนบไฟล์
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'เปิดแอปอีเมลแล้ว',
+                        html: `
+                            <p>กรุณาดำเนินการดังนี้:</p>
+                            <ol style="text-align: left; margin-top: 15px;">
+                                <li>กดปุ่ม "ดาวน์โหลด" เพื่อบันทึกเกียรติบัตร</li>
+                                <li>แนบไฟล์เกียรติบัตรในอีเมลที่เปิดขึ้น</li>
+                                <li>กดส่งอีเมล</li>
+                            </ol>
+                        `,
+                        confirmButtonText: 'เข้าใจแล้ว'
+                    });
+                }
+            }
+        };
+
+        /* =========================================
+           PARTICLE BACKGROUND LOGIC
+           ========================================= */
+        const particleBg = {
+            init: () => {
+                const canvas = document.getElementById('particle-canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+
+                const particles = [];
+                const particleCount = 80;
+
+                class Particle {
+                    constructor() {
+                        this.x = Math.random() * canvas.width;
+                        this.y = Math.random() * canvas.height;
+                        this.vx = (Math.random() - 0.5) * 0.5;
+                        this.vy = (Math.random() - 0.5) * 0.5;
+                        this.size = Math.random() * 3 + 1;
+                        this.color = `rgba(${100 + Math.random() * 100}, ${150 + Math.random() * 100}, 255, ${Math.random() * 0.5})`;
+                    }
+                    update() {
+                        this.x += this.vx; this.y += this.vy;
+                        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+                    }
+                    draw() {
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                        ctx.fillStyle = this.color;
+                        ctx.fill();
+                    }
+                }
+
+                for (let i = 0; i < particleCount; i++) particles.push(new Particle());
+
+                function animate() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                    // Draw connections
+                    for (let i = 0; i < particles.length; i++) {
+                        particles[i].update();
+                        particles[i].draw();
+                        for (let j = i; j < particles.length; j++) {
+                            const dx = particles[i].x - particles[j].x;
+                            const dy = particles[i].y - particles[j].y;
+                            const dist = Math.sqrt(dx * dx + dy * dy);
+                            if (dist < 100) {
+                                ctx.beginPath();
+                                ctx.strokeStyle = `rgba(86, 119, 252, ${0.1 - dist / 1000})`;
+                                ctx.lineWidth = 0.5;
+                                ctx.moveTo(particles[i].x, particles[i].y);
+                                ctx.lineTo(particles[j].x, particles[j].y);
+                                ctx.stroke();
+                            }
+                        }
+                    }
+                    requestAnimationFrame(animate);
+                }
+                animate();
+                window.addEventListener('resize', () => {
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                });
+            }
+        };
+
+        /* =========================================
+           CONFETTI EFFECT (SIMPLE)
+           ========================================= */
+        function confettiEffect() {
+            const count = 200;
+            const defaults = { origin: { y: 0.7 } };
+            // Simple placeholder logic since we don't have external confetti lib
+            // In real world, use canvas-confetti library. Here we simulate visual feedback via Swal.
+            Swal.fire({
+                title: 'CONGRATULATIONS!',
+                text: 'คุณคือสุดยอดนักเรียนพละศึกษา',
+                icon: 'success',
+                backdrop: `rgba(0,0,123,0.4) url("https://media.giphy.com/media/26tOZ42Mg6pbTUPv2/giphy.gif") left top no-repeat`
+            });
+        }
+
+        // Initialize App
+        window.onload = app.init;
+
+    </script>
+</body>
+
+</html>
